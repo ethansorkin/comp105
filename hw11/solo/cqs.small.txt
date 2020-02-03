@@ -1,0 +1,263 @@
+
+ 1. *Receivers, arguments, and messages.*
+    Read the first seven pages of chapter 10, through section 10.1.3.
+    Now examine these expressions from the definition of class
+    `Tikzpicture`, which should be below Figure 10.3 on page 808:
+
+        (div: w 2)
+        (drawOn: shape self)
+        (do: shapes [block (shape) (drawOn: shape self)])
+
+    In each expression, please identify the *receiver*, the
+    *argument*, and the *message*:
+
+    > In `(div: w 2)`,
+    >
+    >   - The receiver is w
+    >   - The argument is 2
+    >   - The message is div:
+
+    > In `(drawOn: shape self)`,
+    >
+    >   - The receiver is shape
+    >   - The argument is self
+    >   - The message is drawOn:
+
+    > In `(do: shapes [block (shape) (drawOn: shape self)])`, 
+    >
+    >   - The receiver is shapes
+    >   - The argument is [block (shape) (drawOn: shape self)]
+    >   - The message is do:
+
+
+ 2. *Colons in method names*.
+    Continuing with the analysis of `Tikzpicture`, in both the
+    protocol and the implementation, method `add:` has one colon in
+    the name, method `draw` has no colons in the name, and the method
+    `drawEllipseAt:width:height:` has three colons in the name.
+
+      - What, if anything, does the number of colons have to do with
+        *receivers*? 
+
+        Your answer: Nothing. There is always only one receiver.
+
+      - What, if anything, does the number of colons have to do with
+        *arguments*? 
+
+        Your answer: the number of colons is equal to the number of arguments
+                     a message expects.
+
+    If you need to, review the presentation in section 10.1.1 
+    on "Objects and Messages," which shows messages sent to shapes.
+
+
+ 3. *Class protocols and instance protocols.*
+    Every *message* is part of some *protocol*.  As example messages,
+    study the transcript in code chunks 803e and 804, which
+    puts three shapes into a picture and then draws the picture.
+
+    (a) Of the messages used in the transcript, which ones are part of
+        the _class_ protocol for `Tikzpicture`, and which are part of
+        the _instance_ protocol?
+
+        'empty' is part of the class protocol. 
+        'add:' and 'draw' are part of the instance protocol
+
+    (b) In general, what do you do with messages in a _class_
+        protocol, and how does that differ from what you do with
+        messages in an _instance_ protocol?
+
+        Messages in a class protocal can be sent to a class, and are generally 
+        used to create a new object. Messages in an instance protocol are those 
+        that can be sent to any instance of the class, often used as producers
+        or observers.
+
+ 4. *Dynamic dispatch, part I: a toy class*.
+    For the mechanisms of message send and dynamic dispatch, read
+    section 10.3.4, which starts on page 820.  Using the class definitions
+    in that section, message `m1` is sent to an object of class `C`.
+    What method *definitions* are dispatched to, in what order?
+
+    Please edit this answer to put in the correct methods and classes:
+
+      - Dispatch to method m1 on class B
+      - Dispatch to method m2 on class C
+
+
+ 5. *Dynamic dispatch, part II: number classes.*
+    Study the implementation of class `Number`, which starts around page 881. 
+    Now study the implementation of class `Fraction`, which starts around
+    page 885.
+
+    When message `-` (minus) is sent to the `Fraction` `(/ 1 2)` with
+    argument `Fraction` `(/ 1 3)`, the computation dispatches message
+    to instance methods of classes Fraction, Number, and SmallInteger,
+    as well as a class method of class Fraction.  We are interested in
+    only *some* of those dispatches---ones that meet *both* of these
+    criteria:
+
+      - The message is sent from a method defined on class `Fraction`
+        or class `Number`.
+
+      - The message is received by an instance of class `Fraction` or
+        class `Number`.
+
+    These criteria rule out *class* methods of class `Fraction`,
+    messages sent to `SmallInteger`, and so on.
+
+    Starting with message `-` (minus) is sent to an instance of
+    `Fraction`, please identify only the interesting dispatches:
+
+        Message     Sent from method     Sent to object      Method defined
+                    defined on class     of class            on class
+
+        -           (anywhere)           Fraction            Number
+        +           Number               Fraction            Fraction
+        negated     Number               Fraction            Fraction
+
+
+ 6. *Dynamic dispatch, part III: messages to `self` and `super`.*
+    Now study the *class* method `new` defined on class `List`, which
+    appears just after page 875.  The definition sends message `new` 
+    to `super`.  (Keep in mind: because `new` is a *class* method, both
+    `super` and `self` stand for the class, not for any instance.)
+
+    (a) When *class* method `new` is executed, what three messages
+        are sent by the method body, in what order?  (If you like, you
+        can also study the message trace shown above, but it may be
+        simpler just to look at the source code.)
+
+        1. sentinel
+        2. new
+        3. new
+
+
+    (b) What does each of the three message sends accomplish?
+
+        1. Sends 'sentinel' to class Sequenceable Collection to set the sentinel
+        2. Sends 'new' to  class SequenceableCollection, which is the superclass
+           of List, to create an instance of this superclass to use its methods
+        3. Sends 'new' to class ListSentinel to create an instance of it, which
+           creates a cons cell that represents the start and end of the list.
+
+
+    (c) If we change `new`'s definition so instead of `(new super)` it 
+        says `(new self)`, which of the following scenarios best describes
+        how the changed program behaves?
+
+        1) The `new` message will be dispatched to class `List`.
+           The same method will run again, and the computation will
+           not terminate.
+
+        2) The `new` message will be dispatched to a different class,
+           and the reply to the `new` message will leave the sentinel
+           pointing to the wrong value.
+
+        3) Nothing will change; in this example, there's no
+           difference between `(new super)` and `(new self)`.
+
+        Your answer: The best description is scenario number 1
+
+
+ 7. *Design of the numeric classes.*
+    Read about coercion in section 10.4.6 on page 839.
+    Look at the last part of the instance protocol for `Number` on page 838.
+    Explain the roles of the methods `asInteger`, `asFraction`,
+    `asFloat`, and `coerce:`.  If you are unsure, look at the
+    implementations of these methods on class `Integer`, starting
+    on page 883.
+
+
+    > The role of `asInteger` is to coerce a Number to be an integer
+
+    > The role of `asFraction` is to coerce a Number to be a fraction
+
+    > The role of `asFloat` is to coerce a Number to be an floating-point number
+
+    > The role of `coerce:` is to produce a Number that is the same kind as the
+                            receiver, with the same value as the argument.
+
+
+    You are ready to implement mixed arithmetic, with coercions, in exercise 44.
+
+
+
+ 8. *Abstract classes in principle.*
+    In section 10.11.1, which starts on page 929 ("Key words and phrases"),
+    you will find a short definition of "abstract class."  What is the
+    *purpose* of an abstract class?  Pick one of the responses below.
+
+    (a) To hide the representation of instances so programmers can
+        change internal details without affecting client code
+
+    (b) To define methods that other classes inherit, so that
+        subclasses get useful default methods
+
+    (c) The same as the purpose of a regular class: to define an abstraction
+
+    Your answer: b
+
+ 9. *Abstract classes in practice: magnitudes and numbers.*
+    Your natural-number class will inherit from abstract class
+    `Magnitude`, and your big-integer code will inherit from
+    `Magnitude` and from `Number`, which is also an abstract class.
+
+    (a) Study the implementation of class `Magnitude`; it is the first
+        dozen lines of code in section 10.7.6, which starts on page 881. 
+        List all the methods that are “subclass responsibility”:
+
+            Your answer: =, <
+
+        These are methods that you must implement in both your
+        `Natural` class and your large-integer classes.
+
+    (b) The very next class definition is the definition of abstract
+        class `Number`.  Read the first code chunk and again, list all
+        the methods that are “subclass responsibility”:
+
+            Your answer: +, *, negated, reciprocal, asInteger, asFraction,
+                         asFloat, coerce
+
+        These are the methods that you must implement in your
+        large-integer classes.  (Two of them, `+` and `*`, must also
+        be implemented in class `Natural`.)
+
+    You are getting ready to implement large integers.
+
+10. *Double Dispatch*.
+    Read section 10.7.5, which starts on page 880.
+    And read the section "laws for multiple dispatch" in the handout 
+    on ["Program Design with Objects"](../handouts/objproofs.pdf).
+    Now, of the methods listed in the previous question, list each one that
+    needs to know *either* of the following facts about its *argument*
+    (not its receiver):
+
+      - Whether the argument is large or small
+      - If the argument is large, whether it is "positive" or "negative"
+
+    For example, `+` is such a method.
+
+    (a) Please list all such methods here:
+
+        Your answer: +, *
+
+
+    (b) The methods in part (a) are exactly the ones that require
+        double dispatch.  The implementation of each such method sends
+        a message to its *argument*, and the exact message depends on
+        the class of the *receiver*.  
+
+        Assume that the receiver is a `LargePositiveInteger`.  Please
+        say, for each method in part (a), what message the method
+        implementation sends to the argument.
+
+        Your answer:
+
+        > Method `+` sends `addLargePositiveIntegerTo:` to the argument  
+        > Method '*' sends 'multiplyLargePositiveIntegerBy:' to the argument
+        
+
+    You are ready to implement large integers (exercise 43).
+
+
+

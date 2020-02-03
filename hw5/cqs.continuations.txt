@@ -1,0 +1,135 @@
+
+ 1. Section 2.12.3, which starts on page 157, describes the semantics
+    of the true-definition forms.  Use the semantics to answer two
+    questions about the following sequence of definitions:
+
+        (val f (lambda () y))
+        (val y 10)
+        (f)
+
+    Given evaluating `lambda` in an environment $\rho$ creates a
+    closure using that same $\rho$, if the definitions above are
+    evaluated in an environment in which $y \in \mathrm{dom}\; \rho$, 
+    then what is the result of the call to `f`? Pick A, B, or C.
+
+      (A) It returns `10`.
+      (B) An error is raised: `Run-time error: name y not found`.
+      (C) It returns whatever value `y` had before the definitions
+          were evaluated.
+
+      The answer is C
+
+    If the definitions above are evaluated in an environment in which
+    $y \notin \mathrm{dom} \;\rho$, what is the result of the call to `f`? 
+    Pick either A or B.
+
+      (A) It returns `10`.
+      (B) An error is raised: `Run-time error: name y not found`.
+
+      The answer is B
+
+
+    *You are ready to start problem 45.*
+
+ 2. Read the description of Boolean formulas in the section 
+    "[Representing Boolean formulas](#representing-boolean-formulas)" below.
+    Then read about μScheme's syntactic sugar for records in 
+    section 2.16.6, which starts on page 194.  Now assume you are given a
+    formula $f_0$, and answer these questions:
+
+      Note: f_0 is the given formula
+    
+      - How, in constant time, do you tell if $f_0$ has the form
+        [(make-not $f$)]{.code}?
+
+        (not? f_0)
+
+      - How, in constant time, do you tell if $f_0$ has the form
+        [(make-and $\mathit{fs}$)]{.code}?
+
+        (and? '(f_0))
+
+      - How, in constant time, do you tell if $f_0$ has the form
+        [(make-or $\mathit{fs}$)]{.code}?
+
+        (or? '(f_0))
+
+    *You are ready to start problems L and F.*
+
+ 3. Read the definition of evaluation in problem E below.
+
+    Each of the following Boolean formulas is evaluated in an
+    environment where `x` is `#t`, `y` is `#f`, and `z` is `#f`.
+    What is the result of evaluating each formula?
+    (For each formula, answer `#t`, "true", `#f`, or "false.")
+
+     (A) $x$, which in μScheme is constructed by `'x`
+
+     #t
+
+     (B) $¬x$, which in μScheme is constructed by `(make-not 'x)`
+
+     #f
+
+     (C) $¬y ∧ x$, which in μScheme is constructed by
+         `(make-and (list2 (make-not 'y) 'x))`
+     #t
+
+     (D) $¬x ∨ y ∨ z$, which in μScheme is constructed by  
+         `(make-or (list3 (make-not 'x) 'y 'z))`
+     #f
+
+     (E) Formula `(make-not (make-or (list1 'z)))`, which has a
+         tricky `make-or` applied to a list of length 1, and so can't
+         be written using infix notation
+     #t
+    
+    *You are ready to start problem E.*
+
+ 4. Read about the Boolean-satisfaction problem for CNF formulas,
+    in section 2.10.1, which starts on page 143.
+    The rules for satisfaction are the same for all Boolean formulas,
+    even those that are not in CNF.
+    
+    For each of the following Boolean formulas, if there is an
+    assignment to `x`, `y`, and `z` that satisfies the formula,
+    write the words "is solved by" and a satisfying assignment.
+    Incomplete assignments are OK.  If there is no satisfying
+    assignment, write the words "has no solution."
+    
+    Examples:
+    
+    $x‌ ∨ y ∨ z$, which in μScheme is constructed by `(make-or '(x y z))`,
+    is solved by `'((x #t))`
+    
+    $x ∧ y ∧ z$, which in μScheme is constructed by `(make-and '(x y z))`,
+    is solved by `'((x #t) (y #t) (z #t))`
+    
+    $x ∧ ¬x$, which in μScheme is constructed by
+    `(make-and (list2 'x (make-not 'x)))`, has no solution
+
+    For each of these formulas, replace the ellipsis with your answer:
+    
+    (A) $(x ∨ ¬x) ∧ y$, which in μScheme is constructed by  
+        `(make-and (list2 (make-or (list2 'x (make-not 'x))) 'y))`,  
+        is solved by '((y #t)).
+
+    
+    (B) $(x ∨ ¬x) ∧ ¬x$, which in μScheme is constructed by  
+        `(make-and (list2 (make-or (list2 'x (make-not 'x))) (make-not 'x)))`,  
+        is solved by '((x #f)).
+
+    (C) $(x ∨ y ∨ z) ∧ (¬x ∧ x) ∧ (x ∨ ¬y ∨ ¬z)$,
+        which in μScheme is constructed by
+
+            (make-and 
+                (list3 (make-or (list3 'x 'y 'z)) 
+                       (make-and (list2 (make-not 'x) 'x))
+                       (make-or (list3 'x (make-not 'y) (make-not 'z))))))
+
+        has no solution.
+
+
+    *You are ready to start problems S and T.*
+
+

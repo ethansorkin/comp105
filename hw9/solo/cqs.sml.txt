@@ -1,0 +1,331 @@
+ 1. Using one of the sources in the [ML learning guide](../readings/ml.html),
+    read about structures, signatures, and matching.  Then answer
+    questions about the structure and signature below.
+
+    The following structure contains definitions that should be
+    familiar from the [ML homework](ml.html) and from code you may
+    have seen in the course interpreters:
+
+        structure ExposedEnv = struct
+          type name   = string
+          type 'a env = (name * 'a) list
+          exception NotFound of name
+          val emptyEnv = []
+
+          fun lookup (name, [])              = raise NotFound name
+            | lookup (name, (x, v) :: pairs) =
+                if x = name then v else lookup (name, pairs)
+
+          fun bindVar (name, value, env) = (name, value) :: env
+        end
+
+    Here is a signature:
+
+        signature ENV = sig
+          type name = string
+          type 'a env
+          val emptyEnv : 'a env
+          val lookup   : name * 'a env -> 'a
+          val bindVar  : name * 'a * 'a env -> 'a env
+        end
+
+    Answer these questions:
+
+    (a) Does the structure match the signature?  That is, if we write
+
+            structure Env :> ENV = ExposedEnv
+
+        does the resulting code typecheck?  Please answer yes or no.
+
+        Yes
+
+    (b) Does the signature expose enough information for us to write
+        the following function?  Please answer yes or no.
+
+            fun extendEnv (names, vals, rho) =
+              ListPair.foldrEq Env.bindVar rho (names, vals)
+
+              Yes
+
+    (c) Does the signature expose enough information for us to write
+        the following function?  Please answer yes or no.
+
+            fun isBound (name, rho) = (Env.lookup (name,rho) ; true) 
+                                      handle Env.NotFound _ => false
+
+            No
+
+    (d) If in part (b) or part (c), it is not possible to write the
+        function given, change the signature to make it possible.
+        If necessary, please copy, paste, and edit your new version in
+        here: 
+
+
+        signature ENV = sig
+          type name = string
+          type 'a env
+          exception NotFound of name
+          val emptyEnv : 'a env
+          val lookup   : name * 'a env -> 'a
+          val bindVar  : name * 'a * 'a env -> 'a env
+        end
+
+
+
+    (e) Suppose I change the `ENV` signature to make the `name` type
+        abstract, so the code reads
+
+            signature ENV' = sig
+              type name
+              type 'a env
+              val emptyEnv : 'a env
+              val lookup   : name * 'a env -> 'a
+              val bindVar  : name * 'a * 'a env -> 'a env
+            end
+            structure Env' :> ENV' = ExposedEnv
+
+        The new structure `Env'`, sealed with signature `ENV'`, is useless.
+        Please explain *why* it is useless:
+
+        This new structure is useless because the user does not know how to 
+        create a name with the signature ENV'.
+
+
+    *You now have the basic ideas needed to understand what is being
+    asked of you in this assignment, and you know enough to implement
+    most of the "take the last coin" game ([exercise C](#coins)).*
+
+
+ 2. An ML _functor_ is a function that operates on the module level.
+    Think of it as a "module in waiting" or a "module builder."
+    A functor's _formal_ parameters, if any, are specified by a
+    _sequence of declarations_, and its _actual_ parameters are given
+    by a _sequence of definitions_.  A functor's _result_ is a
+    structure.  Read about functors in Harper, as recommended in the
+    ML learning guide, then answer the questions below.
+    
+    Here's a typical application of functors.  To keep track of the
+    thousands of tests we run on students' code, I need an efficient
+    "test set" data structure.  But not all tests have the same type.
+    To reuse the data structure with tests of different types, I need
+    a functor.  Here is what my "test set" functor needs to know about
+    a test:
+
+       - A string identifying the student who wrote it
+       - A comparison function that provides a total order on tests
+       - A function that converts a test to a string, for printing
+
+    Using this information, answer parts (a) and (b):
+
+    (a) Write down the information needed for a test set in the form of
+        _formal parameters_ for the functor `TestSetFun`, keeping in mind
+        that a functor's formal parameters are written as a sequence of
+        declarations:
+        
+        
+            signature TEST_DATA = sig
+                type test
+                val name : string
+                val compare : test * test -> order
+                val toString : test -> string
+   
+            functor TestSetFun( structure TestData : TEST_DATA)
+                :> TEST_SET where type test = TestData.test 
+                = struct ... end  (* ignore this part *)
+   
+        The formal parameters must include a declaration that
+        specifies the type of a test, plus enough operations to
+        provide the information needed above.
+   
+    (b) Now focus your attention on one particular test, the `check-type`
+        test. Its representation given by these definitions:
+
+            type uid = string
+            type check_type_test = 
+              uid * int * exp * ty  (* int is sequence number *)
+                
+        The actual parameters to `TestSetFun` must give `check_type_test`
+        as the type of test, and they must provide the operations
+        specified by the formal parameters.  Show how to create a set
+        of `check-type` tests by filling in the _actual parameters_
+        for the `TestSetFun` functor:
+
+            structure CheckTypeSet :> TEST_SET where type test = check_type_test
+              =
+            TestSetFun(
+                       ... fill in definitions here ...
+                      )
+
+
+        The important part here is knowing what definitions to write
+        as actual parameters.  The actual parameters must define all
+        the types and the operations expected as formal parameters.
+        You may also include as many *extra* definitions as you
+        like---extra definitions are ignored.  Here are some useful
+        extra definitions:
+
+            fun uid          (u, _, _, _) = u
+            fun serialNumber (_, k, _, _) = k
+            fun exp          (_, _, e, _) = e
+            fun ty           (_, _, _, t) = t
+
+        When writing your the required definitions, feel free to use
+        these code snippets:
+                
+          - For comparison,
+
+                case String.compare (uid1, uid2)
+                  of EQUAL => Int.compare (seqno1, seqno2)
+                   | diff  => diff
+
+          - For string conversion,
+
+                concat ["(check-type ", expString e, " " , tyString tau, ")"]
+
+            Assume that functions `expString` and `tyString` are given.
+
+
+        Please write your answer above where it says to fill in the
+        definitions. 
+
+    *You now understand functors well enough to use them in exercises I and A.*
+
+ 3. Read about "signature refinement or specialization" in the
+    [ML learning guide](../readings/ml.pdf).  Now,
+
+    (a) Explain what, in part (b) of the previous question, is going
+        on with the `where type` syntax.
+        
+        This syntax patches the signature TEST_SET by specifying the identity of
+        the abstract type "test".
+
+    (b) Explain what would go wrong if we wrote this code instead:
+
+            structure CheckTypeSet :> TEST_SET = TestSetFun(...)
+            
+            The type test would not be defined in the resulting TEST_SET,
+            so there is no way to know how to use that test.
+
+
+    You now know how to refine the result signature of your Abstract
+    Game Solver in exercise A.
+
+
+ 4. Read about abstraction functions and invariants in the handout
+    ["Program Design withAbstract Data Types"](../handouts/adtproofs.pdf).
+    Then, from the ML homework, review the algebraic data type from
+    the [natural-number problems](./ml.html#nat), and review the 
+    [list-with-finger](./ml.html#finger) abstraction.
+
+    Now answer these questions:
+    
+    (a) The handout describes a sorted list as one possible
+        representation for a set.  Define a function `invariant` that
+        takes as argument a list of integers and returns a Boolean
+        saying if the list is sorted in strictly ascending order
+        (that is, increasing, with no repeats).  You may use ML or
+        μScheme, and you may reuse any function assigned for homework
+        this term:
+        
+        fun invariant (x::nil) = true
+          | invariant (x::xs) = if (x <= (hd xs)) then invariant(xs) else false
+        
+
+    (b) In the ML homework, the algebraic type `nat` satisfies two
+        invariants.  In ML, define a function `invariant` of type
+        `nat -> bool`, which returns true if and only if the given
+        representation satisfies both invariants:
+        
+        fun invariant (ZERO) = true
+          | invariant (TIMES10PLUS(m, d)) = if not(m = 0 andalso d = 0) 
+                                            then if (d < 10 andalso d >= 0)
+                                                 then true else false
+                                            else false
+    
+
+    (c) In the ML homework, the `'a flist` represents an abstraction
+        "list with finger."  I ask you to pretend that this
+        abstraction is a value of type `'a fingered list`, where
+        exactly one element is fingered, and `fingered` is defined by
+        
+            datatype 'a fingered
+              = FINGERED   of 'a
+              | UNFINGERED of 'a
+
+        Using your chosen representation of `'a flist`, or, if you did
+        not complete the problem, the representation from the model
+        solutions, define an ML function `absfun` of type
+        `'a flist -> 'a fingered list`, which acts as the abstraction
+        function for the list with finger.  This function acts as the
+        $\mathcal A$ function from the handout:
+        
+        fun absfun(FLIST(left, finger, right)) = 
+                    reverse (map (fn(x) => UNFINGERED(x)) left) @ 
+                      (FINGERED(finger) :: (map (fn(x) => UNFINGERED(x)) right))
+
+
+    *You are now ready to write abstraction functions and invariants
+    in exercises I, N, C, and ADT.*
+
+ 5. Read about short division starting on page 734 of the book,
+    and in ["Mastering Multiprecision Arithmetic"](../readings/arithmetic.pdf).
+
+    (a) Divide 2918 by 7, calculating both quotient and remainder.  
+        At each step, you divide a two-digit number by 7.  The
+        remainder is passed along to form the next two-digit number.
+
+              _________
+            7 | 2 9 1 8
+
+        At each step of the computation, you will take a two-digit
+        dividend, divide by 7, and give quotient and remainder.
+        The first step is
+
+              02 divided by 7  ==  0 remainder 2
+              29 divided by 7  ==  4 remainder 1
+              11 divided by 7  ==  1 remainder 4
+              48 divided by 7  ==  6 remainder 6
+              
+
+        There are four steps in total.  Edit the text above to state
+        the dividend, divisor, quotient, and remainder at each step.
+        Here, write the final four-digit quotient and the one-digit
+        remainder:
+        
+        Final quotient = 0416, remainder = 6
+           
+    You are now ready to implement short division on natural numbers
+    (for exercise N).
+
+
+ 6. Going back to the same reading, and following the examples in the
+    section "Using short division for base conversion," convert a
+    number from decimal to binary and another number from decimal to octal.
+
+    (a) Using repeated division by 2, convert decimal 13 to binary.
+        The ["Mastering Multiprecision Arithmetic"](../readings/arithmetic.pdf)
+        handout shows the form, so please just fill in the right-hand
+        sides here: 
+
+              q0 = 6          r0 = 1
+              q1 = 3          r1 = 0
+              q2 = 1          r2 = 1
+              q3 = 0          r3 = 1
+
+        Now write the converted numeral here: 1101
+
+    (b) Using repeated division by 8, convert decimal 25 to octal 31.
+        Follow the same model: at each step, give the intermediate
+        quotient and remainder, and then form the final quotient by
+        reading off the remainders.
+
+        q0 = 3    r0 = 1
+        q1 = 0    r1 = 3
+
+        Converted numeral: 31
+
+    *You are now ready to implement the `decimal` operation on natural
+    numbers (for exercise N).  This will also enable you to implement
+    the `toString` operation on signed integers.*
+
+   

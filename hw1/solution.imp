@@ -1,0 +1,277 @@
+;;;;;;;;;;;;;;;;;;; COMP 105 IMPCORE ASSIGNMENT ;;;;;;;;;;;;;;;
+;; Ethan Sorkin
+;; 9/11/2018
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;  Exercise L10
+
+;; (log10 n) returns the smallest integer, k, such that 10^(k+1) > n for n > 0. 
+;; In simpler terms, it approximates the base-10 logarithm of n.
+
+;; laws:
+;;   (log10 d) == 0; if d < 10
+;;   (log10 (+ (* 10 m) d)) == (+ 1 (log10 m))); if n >= 10, n = (10 * m + d)
+
+
+(define log10 (n)
+    (if (< n 10)
+        0
+        (+ 1 (log10 (/ n 10)))))
+
+        ;; UNIT TESTS
+        (check-expect (log10 4) 0) ;; checks case where n < 10
+        (check-expect (log10 99) 1) ;; checks case where n > 10 with one 
+                                    ;; recursive call
+        (check-expect (log10 50000) 4) ;; checks case where n > 10 with
+                                       ;; multiple recursive calls
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;  Exercise DD
+
+;; (double-digit n) for any positive integer n < 20000, returns a positive 
+;; integer whose decimal representation is the same as the input, except every
+;; digit appears twice.
+
+;; laws:
+;;    (double-digit d) == (* 11 d); if d < 10
+;;    (double-digit (+ (* 10 m) d)) == (+ (double-digit d) (* 100 
+;;                                     (double-digit m)); 
+;;                                     if n >= 10, n = (10 * m + d)
+
+
+(define double-digit (n)
+    (if (< n 10)
+        (* n 11)
+        (+ (double-digit (mod n 10)) (* 100 (double-digit (/ n 10))))))
+
+
+        ;; UNIT TESTS
+        (check-expect (double-digit 9) 99) ;; checks case where n < 10
+        (check-expect (double-digit 123) 112233) ;; checks case where n > 10
+                                                ;; with recursive calls
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;  Exercise C
+
+;; (population-count n) returns the number of 1-bits in the binary 
+;; representation of a given nonnegative integer
+
+;; laws:
+;;   (population-count z) == 0; if z == 0
+;;   (population-count (+ (* 2 m) b)) == (+ b (population-count m)); if n > 0,
+;;                                                              n = (2 * m + b)
+
+(define population-count (n)
+    (if (= n 0)
+        0
+        (+ (mod n 2) (population-count (/ n 2)))))
+
+        
+        ;; UNIT TESTS
+        (check-expect (population-count 0) 0) ;; checks base case when n = 0
+        (check-expect (population-count 5) 2) ;; checks recursive case, n > 0
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;  Exercise 10
+
+;; (binary n) returns the number whose decimal representation looks like the
+;; binary representation of the integer, n.
+
+;; laws:
+;;   (binary z) == 0, if z == 0
+;;   (binary (+ (* 2 m) b)) == (+ b (* 10 (binary m))); if n > 0, 
+;;                                                      n = (2 * m + b)
+
+(define binary (m)
+    (if (= m 0)
+        0
+        (+ (mod m 2) (* 10 (binary (/ m 2))))))
+
+        ;; UNIT TESTS
+        (check-expect (binary 0) 0) ;; checks base case where n = 0
+        (check-expect (binary 15) 1111) ;; checks case with recursive calls
+        (check-expect (binary -10) -1010) ;; checks negative case with recursion
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;  Exercise 5
+
+;; (log b n) returns the smallest integer, k, such that b^(k+1) > n for n > 0 
+;; and b > 1. In simpler terms, it approximates the base-b logarithm of n.
+
+;; laws:
+;;   (log b n) == 0; if n < b
+;;   (log b n) == (+ 1 (log b (/ n b)))); if n >= b
+
+(define log (b n)
+    (if (< n b)
+        0
+        (+ 1 (log b (/ n b)))))
+
+
+        ;; UNIT TESTS
+        (check-expect (log 4 2) 0) ;; checks case where n < b
+        (check-expect (log 99 99) 1) ;; checks case where n = b with one 
+                                    ;; recursive call
+        (check-expect (log 5 50000) 6) ;; checks case where n >= b^2 with
+                                       ;; multiple recursive calls
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;  Exercise 4
+
+;; (sigma lo hi) returns the summation of lo - 1 (lo + (lo + 1) ... + hi) 
+;; with lo <= hi. Both arguments are integers.
+
+;; laws:
+;;   (sigma lo hi) == (+ lo (sigma (+ lo 1) hi)); if hi > lo
+;;   (sigma lo hi) == lo; if lo == hi
+
+
+(define sigma (lo hi)
+    (if (= lo hi)
+        lo
+        (+ lo (sigma (+ lo 1) hi))))
+
+
+        ;; UNIT TESTS
+        (check-expect (sigma 4 4) 4) ;; checks case where lo = hi
+        (check-expect (sigma 1 5) 15) ;; checks case with recursive calls
+        (check-expect (sigma -4 2) -7) ;; checks case where one argument is
+                                       ;; negative
+        (check-expect (sigma -6 -3) -18) ;; checks case where both arguments
+                                         ;; are negative
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;  Exercise 8
+
+;; (prime? n) returns nonzero ("true") if the nonnegative integer, n, is prime,
+;; and zero ("false") otherwise.
+
+;; laws:
+;;   (prime? n) == 0; if n is not a prime number
+;;   (prime? n) == 1; if n is a prime number
+
+(define prime? (n)
+    (if (< n 2)
+        0
+        (if (or (= n 2) (= n 3))
+            1
+            (if (= (mod n 2) 0)
+                0
+                (check-for-factors n (/ n 2))))))
+
+
+        ;; UNIT TESTS
+        (check-assert (not (prime? 1))) ;; checks case where n < 2
+        (check-assert (prime? 2)) ;; checks case where n == 2 (first prime)
+        (check-assert (prime? 3)) ;; checks case where n == 3 (second prime)
+        (check-assert (not (prime? 299))) ;; checks when n is a large non-prime
+        (check-assert (prime? 113)) ;; checks case when n is a large prime
+
+
+;; (check-for-factors n i) returns nonzero ("true") if there are no factors of
+;; n between 2 and i, returns zero ("false") when a factor of n is found in 
+;; that range. n > i and both are positive integers. (Helper function)
+
+;; laws:
+;;   (check-for-factors n i) = 1; if no factor of n is found in the range 2 - i
+;;   (check-for-factors n i) = 0; if i is a factor of n
+;;   (check-for-factors n i) = (check-for-factors n (- i 1)); if i is not a 
+;;                                                                  factor of n
+
+(define check-for-factors (n i)
+    (if (= i 2)  ;; when all potential factors have been checked
+        1
+        (if (= (mod n i) 0)
+            0
+            (check-for-factors n (- i 1)))))
+
+
+        ;; UNIT TESTS
+        (check-assert (check-for-factors 5 2)) ;; checks base case where i = 2
+        (check-assert (not (check-for-factors 9 4))) ;; checks recursive case
+                                                    ;; where factor is in range
+        (check-assert (check-for-factors 47 23)) ;; checks recursive case where
+                                                ;; no factor will be found
+
+
+;; (nthprime n) returns the nth prime number, with 2 being the first, for n > 0.
+
+;; laws:
+;;   (nthprime n) == 2; if n == 1
+;;   (nthprime n) == (find-prime (- n 1) 3); if n > 1
+
+(define nthprime (n)
+    (if (= n 1)
+        2
+        (find-prime (- n 1) 3)))
+
+        ;; UNIT TESTS
+        (check-expect (nthprime 1) 2) ;; checks base case when n = 1
+        (check-expect (nthprime 14) 43) ;; checks recursive case when n > 1
+
+;; (find-prime n p) returns the nth prime number starting at the odd number p.
+;; (Helper function)
+
+;; laws:
+;;   (find-prime 1 p) == p; if p is prime
+;;   (find-prime n p) == (find-prime (- n 1) (+ p 2)); if p is prime and n > 1
+;;   (find-prime n p) == (find-prime n (+ p 2)); if p is not prime
+
+(define find-prime (n p)
+    (if (and (= n 1) (prime? p))
+        p
+        (if (prime? p)
+            (find-prime (- n 1) (+ p 2))
+            (find-prime n (+ p 2)))))
+
+
+        ;; UNIT TESTS
+        (check-expect (find-prime 1 3) 3) ;; checks base case where p is a prime
+                                          ;; and n = 1
+        (check-expect (find-prime 5 3) 13) ;; checks recursive case to find the 
+                                           ;; 5th prime starting at 3
+        (check-expect (find-prime 4 9) 19) ;; checks recursive case where p is
+                                           ;; not prime
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;;  Exercise O
+
+;; (overflow) causes a checked run-time error that indicates an arithmetic
+;; overflow. It takes no arguments.
+
+;; laws: There are no algebraic laws for this function, as there is no input.
+
+(define overflow ()
+    (* 999999999 9))
+
+        ;; UNIT TESTS
+        (check-error (overflow)) ;; checks that the function triggers an error
+        (check-assert (* 99999999 9)) ;; checks that a very similar 
+        ;; function with a slightly smaller return value does not cause an 
+        ;; error. This shows that the error produced by the function "overflow" 
+        ;; does in fact indicate an arithmetic overflow, rather than another
+        ;; checked run-time error.
+
+        

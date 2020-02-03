@@ -1,0 +1,30 @@
+
+//Problem 1
+not = \b.b false true;
+
+even? = \n.n not true;
+
+
+//Problem 2
+inc = \p.(even? (succ (fst p))) (pair (succ (fst p)) (succ (snd p))) 
+                                (pair (succ (fst p)) (snd p));
+
+div2 = \n. snd (n inc (pair 0 0));
+
+
+
+//Problem 3
+iszero? = \n.n (\x.false) true;
+10 = \f.\x. f (f (f (f (f (f (f (f (f (f x)))))))));
+
+noreduce binary = Y (\bin.\m. (iszero? m) 0 (+ ((even? m) 0 1) (* (bin (div2 m))
+                                                                          10)));
+
+//Problem 4
+
+noreduce nth = \n.\xs. car (n cdr xs);
+
+
+
+
+

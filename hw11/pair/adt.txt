@@ -1,0 +1,63 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;
+;;;; Exercise ADT
+
+For Exercise 42
+
+  NatZero:
+    Instance Variables: none
+
+    ;; Abstraction Function
+    ;; A (self) = 0   ;; the subclass NatZero is only a representation for the
+                      ;; integer zero so any instance of itself is 0
+
+    ;; Any instance of the NatZero class is a valid input
+
+
+  NatNonZero: 
+    Instance Variables: nat, dig
+
+    ;; Abstraction Function
+    ;;   Numbers are built up recursively with the next significant digit
+    ;;   built using another instance of a Natural integer.  For a singular
+    ;;   digit, the natural is a NatZero instance.
+    ;; A (nat dig) = (nat * base) + dig  
+
+
+    ;; The invariant for a NatNonzero is that neither m or d can be less than 0
+    ;;   and the digit 9 must be less than or equal to 9.  Also, m and d both
+    ;;   can't be zero, or it would be an instance of NatZero.  
+    (method invariant:: (m d) (and: (not (and: (= m 0) {(= d 0)})) ;; private 
+                                    {(and: (>= m 0) 
+                                           {(and: (>= d 0) {(<= d 9)})})}))
+
+  Our Representation:
+    We chose the representation we did because it made intuitive sense to us to
+    have a representation that built on top of each other.  This allowed the
+    methods to be implemented very similarly to hw 6 and hw9 and having the
+    algebraic laws for the methods made implementation much easier.  We do not
+    have any regrets on our implementation.
+
+
+For Exercise 43
+  No instance variables in concrete subclasses LargePositiveInteger and
+    LargeNegativeInteger
+  LargeInteger
+    Instance Variables: magnitude
+
+  Abstraction Function and Invariant Function are in LargeInteger because the
+    concrete subclasses are just representations of positive and negative
+    integers.  Made more sense to combine the Abstraction and Invariant
+    functions into the same one to show the relationship.
+
+    ;; Abstraction Function
+    ;;   Numbers are built using an instance variable mag (which is an instance
+    ;;   of Natural) in the LargeInteger class and two subclasses.  If the 
+    ;;   input integer is positive, an instance of LargePositiveInteger is 
+    ;;   created.  If the input integer is negative, an instance of
+    ;;   LargeNegativeInteger is created.
+    ;; A (+mag) = LargePositiveInteger
+    ;; A (-mag) = LargeNegativeInteger
+
+    ;; The invariant for a LargePostive integer is the input can be any integer
+    (method invariant: (m) true)

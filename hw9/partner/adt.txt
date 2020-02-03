@@ -1,0 +1,95 @@
+Josh DeSieno, Ethan Sorkin
+Comp 105 : Modules and Abstract Types
+Exercise ADT
+
+datatype bigint = POSITIVE of N.nat
+                | NEGATIVE of N.nat
+                | ZERO
+
+(* Abstraction function: 
+ * 
+ * CONVERTING FROM INT TO BIGINT:
+ * BigNum.ofInt(x) = POSITIVE(natural.ofInt(x)), where x > 0
+ * BigNum.ofInt(x) = NEGATIVE(natural.ofInt(x)), where x < 0
+ * BigNum.ofInt(0) = ZERO
+ *)
+
+fun invariant (POSITIVE(n)) = N.invariant(n)
+  | invariant (NEGATIVE(n)) = N.invariant(n)
+  | invariant ZERO          = true
+
+We chose this representation for bigint because the ZERO data constructor 
+allowed us to avoid having various representations of 0. Also, because the
+POSITIVE and NEGATIVE data constuctors allowed us to represent 
+magnitude and sign seperately. 
+----------------------------------------------------------------
+
+ datatype nat = LITTLE_ENDIAN of digit list  
+(* where 0 <= digit < base and digit list is non-empty *)
+
+(* abstraction function:
+ *  
+ *  CONVERTING FROM INT TO NAT:
+ *  ofInt(x) = LITTLE_ENDIAN(x mod base::ofInt(x/10)), where x >= base
+ *  ofInt(x) = LITTLE_ENDIAN([x]), where 0 <= x < base.
+ *  
+ *  CONVERTING FROM NAT TO INT:
+ *  ofNat(LITTLE_ENDIAN(x::y::xs)) = foldr (fn(d, m) => d + (base * m)) 0 
+ *                                                             (x::y::xs)
+ *  ofNat(LITTLE_ENDIAN(x::nil)) = x
+ *)
+
+
+fun invariant (LITTLE_ENDIAN(x::xs)) = 
+    let fun checkList (y::ys) = if (y < 0 orelse y >= base) 
+                                then false else checkList ys
+          | checkList nil     = true 
+    in
+        checkList(x::xs)
+    end 
+  | invariant _ = false
+
+We chose this representation of natural numbers because we thought 
+many of the basic arithmetic operations, such as plus and minus,
+are executed in little endian order. Thus, our representation
+lent itself to implementing those operations.
+----------------------------------------------------------------
+
+ datatype state = PQDN of Player.player * int * int * int
+
+(* State abstraction function: 
+ * Given that q, d, and n represent the number of remaining quarters, dimes, 
+ * and nickels respectively, along with which player p's turn it is,
+ * our corresponding state is PQDN(p, x, y, z).
+ *
+ * Given that there are no coins left on the table, and it is player p's 
+ * turn, player p has lost because the other player picked the last coin
+ * which made the state FINAL(P).
+ *)
+
+fun invariant (PQDN(p, q, d, n)) =  q <= 4  andalso q >= 0 andalso 
+                                    d <= 10 andalso d >= 0 andalso
+                                    n <= 7  andalso n >= 0 
+
+We chose this representation of state because it had the most simple
+invariant and because it was very easy to decided when the game had
+reached final state: PQDN(p, 0, 0, 0). 
+----------------------------------------------------------------
+
+type move = (string * int)
+
+(* State abstraction function:
+ * Our representation of a move is a pair containing a string and int.
+ * The string must be "quarter", "dime", or "nickel", as it represents 
+ * the denomination; and the integer must be in the appropriate range
+ * of quantities for each denomination.
+ *)
+
+fun invariant ("quarter", n) = n <= 4 andalso n > 0 
+  | invariant ("dime", n)    = n <= 10 andalso n > 0
+  | invariant ("nickel", n)  = n <= 7 andalso n > 0
+  | invariant _              = false
+
+Again, we chose this representation because it allowed for the 
+simplest invariant we could think of.
+

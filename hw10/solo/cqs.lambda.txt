@@ -1,0 +1,128 @@
+ 1. *Syntax of lambda terms*.  In this assignment, or in Rojas or Panangaden,
+    read about [the concrete syntax of lambda-terms](#the-syntax-of-terms).  
+    Now define, in Standard ML, an algebraic data type `term` that
+    represents the _abstract_ syntax of terms.  Your data type should
+    have one value constructor for a variable, one for a lambda
+    abstraction, and one for an application.
+
+    datatype term = VAR of string
+                  | LAM of (string * term)
+                  | APP of (term * term)
+
+
+    You are ready for exercise 5, and you have a foundation for
+    exercises 6 and 8.
+
+
+ 2. *Recognizing redexes*. Read about redexes in
+    [Wikipedia](https://en.wikipedia.org/wiki/Lambda_calculus#Reduction).
+    (You will then follow up with 
+    [Panangaden](https://www.cs.tufts.edu/comp/105/readings/prakash.pdf).)
+
+    (a) Wikipedia mentions two kinds of redex.  What are their names?
+
+        beta-redex and eta-redex
+
+    (b) In Panangaden, Definition 1.7 defines a redex.  Which of the
+        two redexes mentioned in Wikipedia is being defined here?
+
+        beta-redex
+
+
+    Your code will have to recognize redexes, and it starts with
+    knowing the form of each kind.  As of Fall 2018, both forms are
+    shown in Wikipedia.  But if Wikipedia changes, one form can be
+    found in Panangaden; for the other, look in the last section of my
+    guide to reduction strategies.
+
+    (c) For each of the two kinds of redex, use the concrete syntax
+        for our lambda interpreter ([see above](#the-syntax-of-terms))
+        to show what form every redex of that kind takes.
+
+        beta-redex = (\name.term1) term2
+        eta-redex  = (\name.term) name 
+
+    (d) For each of the two kinds of redex, use your algebraic data
+        type from the preceding question to write a pattern that
+        matches every redex of that kind.
+
+        eta-redex  = APP(LAM(name, term), name)
+
+        beta-redex = APP(LAM(name, term1), term2)
+
+    You are getting ready for exercise 8 (reductions).
+
+
+ 3. *Practicing reduction*.  Read about
+    [reduction](https://en.wikipedia.org/wiki/Lambda_calculus#Reduction) 
+    on Wikipedia.  Then in
+    [Panangaden](https://www.cs.tufts.edu/comp/105/readings/prakash.pdf),
+    be sure you have an idea about each of these concepts:
+
+      - Capture-avoiding *substitution* (Definition 1.3)
+
+      - *Reduction* (Definition 1.5), including the example reduction
+        (Example 1.3)
+
+      - *Redex*, *contractum*, and *normal form* (Definitions 1.7 and 1.8)
+
+    Showing each reduction step, reduce the following term to normal form.
+    At each step, choose a redex and replace the redex with its contractum.
+    Do not expand or replace the names `ZERO` and `NONZERO`.
+
+        (\n.(n (\z.NONZERO)) ZERO) (\f.\x.f x)
+        -> ((\f.\x.f x) (\z.NONZERO)) ZERO
+        -> (\x.(\z.NONZERO) x) ZERO
+        -> (\z.NONZERO) ZERO
+        -> NONZERO
+
+    The term contains more than one redex, but no matter which redex
+    you choose at each step, you should reach the normal form after
+    exactly four reductions.
+
+
+    You are preparing to complete exercise 8.  
+
+
+ 4. *Reduction: the general case*.  For each kind of redex, repeat the
+    general form of the redex from question 2(c) above, then show what
+    syntactic form the redex reduces to (in just a single reduction step).
+
+        beta-redex = (\name.term1) term2
+        -> term1[name -> term2]
+
+        eta-redex  = (\name.term) name
+        -> term
+
+
+    You are getting ready for exercise 8 (reductions).
+
+
+ 5. *When to reduce*. Read my [handout on reduction
+    strategies](../readings/reduction.pdf). Using [the concrete syntax
+    accepted by the interpreter (and defined above)](#the-syntax-of-terms),
+    write a lambda term that contains exactly two redexes, such that
+    _normal-order_ reduction strategy reduces one redex, and
+    _applicative-order_ reduction strategy reduces the other redex.
+
+
+    (\f.(\x.x) z) (\y.(\y. y) f)
+
+
+    You are (finally!) ready for exercise 8.
+
+ 6. *Understanding Church numerals*.  You may recognize the practice
+    reduction above as a computation that tells if a Church numeral is
+    zero.  Read about Church numerals, either on pages 9 and 10 of
+    Panangaden or in Section 2 of Rojas ("Arithmetic").  Then, say
+    whether each of the following lambda-calculus terms is a Church
+    numeral.  If so, write the corresponding decimal representation.
+    If not, write "not a Church numeral".
+
+        \f.x      -> not a Church numeral
+        \f.\x.x   -> Church numeral 0
+        \f.\x.f   -> not a Church numeral
+        \f.\x.f x -> Church numeral 1
+        \x.\x.f (f (f (f (f x)))) -> not a Church numeral
+        
+    You are ready for exercises 1 to 4.

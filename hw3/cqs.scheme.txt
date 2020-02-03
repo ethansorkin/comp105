@@ -1,0 +1,193 @@
+ 1. Read Section 2 of the handout ["Programming With Scheme Values and
+    Algebraic Laws"](../handouts/sxproofs.pdf).
+    
+    You are tasked with writing a function that consumes a list of
+    numbers:
+    
+    (a) How many cases must you consider? 2
+
+    (b) To tell the cases apart, what condition or conditions will you
+        use in `if` expressions?  (List one fewer condition than cases.)
+
+        (if (null? x))
+
+    You are tasked with writing a function that consumes an ordinary
+    S-expression.
+    
+    (c) How many cases must you consider? 5
+
+    (d) To tell the cases apart, what condition or conditions will you
+        use in `if` expressions?  (List one fewer condition than cases.)
+
+        (if (symbol? x))
+        (if (number? x))
+        (if (boolean? x))
+        (if (null? x))
+
+    _You are ready to write algebraic laws using Scheme data._
+
+ 2. Read Section 4 of the same handout (["Programming With Scheme Values and
+    Algebraic Laws"](../handouts/sxproofs.pdf)).  Understand the three
+    faults that are described there, then answer these questions:
+    
+    (a) Here is an algebraic law:
+    
+            (binary (* 2 m)) == (* 10 (binary (/ m 2)))
+
+        Which of the three faults in the section, if any, manifest
+        themselves in this algebraic law?  (Answer "first", "second,"
+        "third", or any combination thereof, including "none".)
+        
+        second
+
+    (b) Here is an algebraic law:
+    
+            (double-digit (+ (* 10 m) b) == 
+               (+ (* (double-digit (/ n 10)) 100) (double-digit (mod n 10)))
+
+        Which of the three faults in the section, if any, manifest
+        themselves in this algebraic law?
+
+        first
+
+    (c) Here is an algebraic law:
+        
+            (population-count (* m 2)) == 
+               (+ (population-count (mod m 10))
+                  (population-count (/ m 10))
+
+        Which of the three faults in the section, if any, manifest
+        themselves in this algebraic law?
+
+        second and third
+
+    _You are able to avoid these common faults._
+
+ 3. In the main textbook, review section 2.2 on
+    values, S-expressions, and primitives, and say what is the value
+    of each of the expressions below.
+    If a run-time error would occur, please say so.
+
+        (car '(a b 1 2)) = 'a
+        (cdr '(a b 1 2)) = '(b 1 2)
+        (= 'a 'b)        = #f
+
+    Write your answers as S-expression literals, like `'(a b c)`,
+    `#t`, or `17`.
+
+    _You are on your way to being ready for exercise **F**._
+
+ 4. In the main textbook, review the first few pages of section 2.3, 
+    through the end of section 2.3.2, and also section 2.3.5, which
+    starts on page 103. Which of the following expressions
+    evaluates to `#t` for every *list of ordinary S-expressions* `xs`?
+
+        (=      (reverse (reverse xs)) xs)
+        (equal? (reverse (reverse xs)) xs)
+
+    (a) Only the first
+    (b) Only the second
+    (c) Both the first and the second
+    (d) None
+
+    The answer is (b) Only the second
+
+ 5. Read section 2.3.2, then please explain in your own words the
+    difference between `simple-reverse` and `reverse`.
+
+    'reverse' calls 'revapp' on the given list and the empty list, which is
+    more efficient because it creates new cons cells every recursive call by 
+    adding values to the head of ys in reverse order. 'simple-reverse' is much
+    slower, running at O(n^2), because it iterates through every element, and
+    calls append, taking O(n) time and space, on the singleton list created
+    in the previous recursive call.
+
+    _You are now mostly ready for exercise 35._
+
+ 6. Read about association lists in section 2.3.8, which starts on page 106.
+    Given the definition
+
+        (val mascots '((Tufts Jumbo) (MIT Beaver) (Northeastern Husky) 
+                                                                 (BU Terrier)))
+        
+    Say what is the value of each of these expressions:
+
+        (find 'Tufts   mascots) = Jumbo
+        (find 'MIT     mascots) = Beaver
+        (find 'Harvard mascots) = ()
+        (find 'MIT (bind 'MIT 'Engineer mascots)) = Engineer
+
+ 7. Read Section 3 of the handout ["Programming With Scheme Values and
+    Algebraic Laws"](../handouts/sxproofs.pdf) and the first part of
+    section 2.4 of the main textbook, up to and including section 2.4.4.
+
+    Now complete the following law, which should represent a true
+    *property* of the association-list functions `find` and `bind`:
+    
+        (find x (bind x xval al)) = xval 
+        
+    You may use variables, and you may use forms of data made with
+    `'()` and with `cons`.  You may not use any atomic literals.
+    Write your property in the style of section 2.4.4.
+
+    _You are now prepared for the algebraic laws in exercises **A**,
+    **B**, and **C**._
+
+ 8. Read section 2.16.6, which starts on page 194.
+    Imagine that μScheme is given the following definition:
+
+        (record 3point (x y z))
+
+    This definition puts five functions into the environment ρ.
+    What are their names?
+
+    make-point
+    point?
+    point-x
+    point-y
+    point-z
+
+    _You are now mostly ready for exercise **E**._
+
+ 9. Read section 2.5, which explains `let`, `let*`, and `letrec`.
+    This question asks you to decide if any or all these forms can
+    appropriately express the following function (written in C):
+
+        bool parity(int m) {
+          int half_m     = m / 2;
+          int other_half = m - half_m;
+          return half_m == other_half;
+        }      
+
+    Scheme does not have local variables, so to translate this
+    function into μScheme, you must use `let`, `let*`, or
+    `letrec`.  For each of these syntactic forms, we ask you if a
+    translation sensibly and faithfully captures the intent and behavior of the
+    original C function. 
+
+        ;; Translation A
+        (define parity (m)
+           (let ([half_m     (/ m 2)]
+                 [other_half (- m half_m)])
+             (= half_m other_half)))
+
+    Is translation A sensible and faithful (yes or no)? no
+             
+        ;; Translation B
+        (define parity (m)
+           (let* ([half_m     (/ m 2)]
+                  [other_half (- m half_m)])
+             (= half_m other_half)))
+
+    Is translation B sensible and faithful (yes or no)? yes
+
+        ;; Translation C
+        (define parity (m)
+           (letrec ([half_m     (/ m 2)]
+                    [other_half (- m half_m)])
+             (= half_m other_half)))
+
+    Is translation C sensible and faithful (yes or no)? no
+
+
+    _You are now ready for exercise 30._

@@ -1,0 +1,96 @@
+Please read pages 6--14 in *Programming Languages: Build, Prove, and Compare*.  
+
+1.  What is the value of the following Impcore expression?
+
+        (if (> 3 5) 17 99)
+
+        The value of this expression is 99.
+
+2.  Which of the following best describes the syntactic structure of
+    Impcore?
+
+    (a)   An expression can contain a definition
+    (b)   A definition can contain an expression
+    (c)   Both of the above
+    (d)   None of the above
+
+    (b) best describes the syntactic structure of Impcore.
+
+3.  Does the following Impcore test pass? Please answer "yes" or "no."
+
+        (check-expect (+ 1 2 3) 6)
+        no
+
+    Assuming `x` is bound to a global variable, does the following
+    Impcore test pass? Again, please answer "yes" or "no."
+
+        (check-expect (set x 1) 1)
+        yes
+
+Next read section 1.2, which starts on page 15, about abstract syntax.
+
+4.  After reading about abstract syntax, look at this picture of an
+    abstract-syntax tree for a "calculator expression":
+
+    Answer these questions:
+
+    (a) What concrete syntax could you write in C for this expression?
+    9 - (12 / 3)
+
+    (b) What concrete syntax could you write in Impcore for this expression?
+
+    (- 9 (/ 12 3))
+
+Read the handout on programming with proof systems and algebraic laws,
+at <https://www.cs.tufts.edu/comp/105/handouts/natproofs.pdf>.
+
+5.  I show you a recursive function `f` that takes one argument, 
+    a natural number `n`.  The structure of `n`, and therefore the
+    recursion pattern of `f`, are based on the Peano proof system from
+    the handout.
+
+    (a) What are the different ways `n` can be formed?
+    'n' can be formed by either being 0, or a successor of another natural
+    number (m + 1).
+
+    (b) When `f` is given `n`, what code do you expect `f` to use to
+        determine how `n` was formed?
+    I would expect 'f' to check if 'n' equals zero, in which case it passes the
+    test and returns. If 'n' does not equal zero, it would repeatedly subtract
+    'n' by 1 until reaching zero to ensure the previous number is also natural.
+
+    (c) For which values of `n` do you expect `f` to make a recursive call?
+    Any input that does not equal zero will make a recursive call.
+
+    (d) When a recursive call is made, what value is passed as argument?
+    (n - 1) is passed as an argument in a recursive call.
+
+
+Read the expectations about contracts in the [*course coding
+guidelines*](../coding-style.html#contracts).
+
+6.  Suppose I write a contract for a `power` function that says, "this
+    function multiplies $x$ by itself $n$ times."  According to our
+    expectations, is this a good contract or a bad contract?
+    Please answer "good" or "bad."
+
+    bad
+
+7.  At the end of the handout on programming with proof systems and
+    algebraic laws, you will find a section on "Complete process examples."
+    This section suggests that the `factorial` function---but not the
+    `power` function---could be submitted without a contract.
+    
+    (a) Why would it be OK to submit the `factorial` function without
+        a contract?  For an idea, look at the "Exemplary" column in
+        the "Documentation" section of the general coding rubric.
+
+        This would be OK because 'factorial' is a noun that describes what the
+        function returns.
+
+    (b) Why doesn't the same argument apply to the `power` function?
+        For an idea, check the programming handout.
+
+        This does not apply to 'power' because it takes 2 parameters, and we do
+        not know which argument is the base and which is the exponent.
+

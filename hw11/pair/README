@@ -1,0 +1,30 @@
+README
+COMP 105 - SmallTalk (pair)
+
+Name: Jonathan Chang
+Partner: Ethan Sorkin
+
+
+Others with whom you have collaborated or discussed the assignment: 
+  TA: Vera Guttenberger
+  TA: Kell Pogue
+  THE Norman Ramsey
+  Used the solutions from SML 
+
+Parts of the assignment completed: 
+All exercises completed
+
+Extra Credit:
+None
+
+How we tested our Bignum code
+  To test our Bignum code, we implemented operations one at a time and tested
+  each operation fully before moving to the next.  We followed the format of
+  the Bignum handout implementing all operations of NatZero, then up top in
+  Natural, then the NatNonZero operations.  We compared out outputs to the
+  outputs of SmallIntegers in the usmalltalk interpreter.  We also utilized
+  the testing methods from the spec on Natural numbers.
+
+
+Any comments or feedback for course staff: 
+Happy Holidays!
